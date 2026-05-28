@@ -26,9 +26,18 @@ jobs:
         with:
           node-version: 20
           cache: npm
-      - uses: actions/configure-pages@v5
+      # enablement: true turns Pages on via the API so no manual Settings toggle
+      # is needed (works for public repos / plans where Pages is available).
+      - id: pages
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - run: npm ci
       - run: npm run build
+        env:
+          # Build for the project sub-path (https://<owner>.github.io/<repo>/).
+          # Remove this if you serve from a custom root domain.
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: out
