@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  /* Soft premium backdrop with a calm gradient wash. */
+  background:
+    radial-gradient(120% 60% at 50% 0%, #f1f7f6 0%, #f6f8f7 40%, #f3f5f4 100%);
+  color: theme("colors.ink.DEFAULT");
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Respect the iOS safe area for sticky bottom actions. */
+.safe-bottom {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
