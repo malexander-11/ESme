@@ -12,13 +12,16 @@ import type {
 
 const SECTOR_ORDER: Sector[] = [
   "Technology",
+  "Financials",
+  "Healthcare",
+  "Industrials",
   "Energy",
   "Consumer staples",
   "Luxury",
   "Speculative growth",
 ];
 
-const REGION_ORDER: Region[] = ["US", "UK", "Europe", "Emerging markets"];
+const REGION_ORDER: Region[] = ["US", "UK", "Europe", "Asia", "Emerging markets"];
 
 /** How strongly an action applies a card's effects (and in which direction). */
 function actionScale(action: CardAction): number {
@@ -47,6 +50,9 @@ function emptyTilts(): Tilts {
   return {
     sectors: {
       Technology: 0,
+      Financials: 0,
+      Healthcare: 0,
+      Industrials: 0,
       Energy: 0,
       "Consumer staples": 0,
       Luxury: 0,
@@ -56,6 +62,7 @@ function emptyTilts(): Tilts {
       US: 0,
       UK: 0,
       Europe: 0,
+      Asia: 0,
       "Emerging markets": 0,
     },
   };
@@ -81,12 +88,6 @@ function accumulate(choices: Choice[]): Tilts {
       }
     }
   }
-
-  // Emerging markets has no direct cards; it gently absorbs the inverse of
-  // developed-market tilts so the geographic picture stays directional.
-  const developed =
-    tilts.regions.US + tilts.regions.UK + tilts.regions.Europe;
-  tilts.regions["Emerging markets"] -= Math.round(developed * 0.35);
 
   return tilts;
 }

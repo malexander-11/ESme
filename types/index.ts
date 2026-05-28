@@ -21,12 +21,15 @@ export interface BaseIndex {
 /** Named sectors and regions used by the (mocked) impact engine. */
 export type Sector =
   | "Technology"
+  | "Financials"
+  | "Healthcare"
+  | "Industrials"
   | "Energy"
   | "Consumer staples"
   | "Luxury"
   | "Speculative growth";
 
-export type Region = "US" | "UK" | "Europe" | "Emerging markets";
+export type Region = "US" | "UK" | "Europe" | "Asia" | "Emerging markets";
 
 /**
  * Directional nudges a card applies "per +1 of action".

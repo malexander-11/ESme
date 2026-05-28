@@ -41,9 +41,11 @@ npm run lint    # run ESLint
 1. **Landing** — the pitch and a single call to action.
 2. **Base index selection** — choose one of four diversified starting indices
    (defaults to the Global Market Index).
-3. **Customisation cards** — work through 14 cards one at a time. Companies and
+3. **Customisation feed** — an endless, TikTok-style vertical swipe feed of
+   cards drawn from a large pool (companies, themes and beliefs). Companies and
    themes offer **More / Keep / Less / Remove**; beliefs offer
-   **Agree / Neutral / Disagree**.
+   **Agree / Neutral / Disagree**. Swipe through as many as you like, then tap
+   **"View your personalisation and risk"** whenever you're ready.
 4. **Portfolio impact summary** — see how your choices shift sector and
    geographic exposure, diversification health, top-10 concentration and a
    plain-English risk note. The summary responds directionally to your choices.
