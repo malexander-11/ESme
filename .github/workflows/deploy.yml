@@ -1,9 +1,13 @@
 name: Deploy to GitHub Pages
 
 on:
-  # Deploy whenever the default branch updates.
+  # Deploy on pushes to the default branch (claude/...) and to main. The
+  # github-pages environment only allows deploys from the default branch, so the
+  # default branch is what actually publishes here.
   push:
-    branches: [main]
+    branches:
+      - main
+      - claude/ecstatic-cray-Ez9iY
   # Allow manual runs from the Actions tab.
   workflow_dispatch:
 
