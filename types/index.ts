@@ -41,6 +41,12 @@ export interface CardEffects {
   regions?: Partial<Record<Region, number>>;
 }
 
+/** Mocked, illustrative "AI" bull/bear takes shown on a card. */
+export interface AiPerspectives {
+  optimist: string;
+  pessimist: string;
+}
+
 export interface BaseCard {
   id: string;
   type: CardType;
@@ -49,6 +55,8 @@ export interface BaseCard {
   tags: string[];
   /** Display label for current weight/exposure, e.g. "3.8%" (companies/themes). */
   exposureLabel?: string;
+  /** Optional mocked AI optimist/pessimist views (companies & themes). */
+  ai?: AiPerspectives;
   /** Hidden metadata driving the impact summary. */
   effects: CardEffects;
 }

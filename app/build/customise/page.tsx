@@ -7,6 +7,7 @@ import { shuffledBatch } from "@/lib/deck";
 import { cards } from "@/data/cards";
 import type { BaseCard, CardAction } from "@/types";
 import { CustomisationCard } from "@/components/CustomisationCard";
+import { SwipeCard } from "@/components/SwipeCard";
 
 export default function CustomisePage() {
   const { setChoice, getChoice, choices } = useBuild();
@@ -15,22 +16,16 @@ export default function CustomisePage() {
   // Seed deterministically (matches the server render to avoid a hydration
   // mismatch), then shuffle into the endless deck once mounted on the client.
   const [feed, setFeed] = useState<BaseCard[]>(cards);
-  const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     setFeed(shuffledBatch());
   }, []);
 
-  const appendBatch = useCallback(() => {
-    setFeed((prev) => [...prev, ...shuffledBatch(prev[prev.length - 1]?.id)]);
-  }, []);
-
-  // Track the visible card and top up the deck as the user nears the end.
+  // Top up the deck as the user nears the end so it never runs out.
   const handleScroll = useCallback(() => {
     const el = scrollRef.current;
     if (!el) return;
     const idx = Math.round(el.scrollTop / el.clientHeight);
-    setActiveIndex(idx);
     setFeed((prev) =>
       idx >= prev.length - 3
         ? [...prev, ...shuffledBatch(prev[prev.length - 1]?.id)]
@@ -38,12 +33,31 @@ export default function CustomisePage() {
     );
   }, []);
 
-  // Safety net: ensure the deck always has runway even without scrolling.
-  useEffect(() => {
-    if (feed.length < 6) appendBatch();
-  }, [feed.length, appendBatch]);
+  // Record a choice and slide on to the next card.
+  const chooseAndAdvance = useCallback(
+    (cardId: string, action: CardAction, index: number) => {
+      setChoice(cardId, action);
+      setFeed((prev) =>
+        index + 1 >= prev.length
+          ? [...prev, ...shuffledBatch(prev[prev.length - 1]?.id)]
+          : prev,
+      );
+      window.setTimeout(() => {
+        const el = scrollRef.current;
+        if (el) {
+          el.scrollTo({
+            top: (index + 1) * el.clientHeight,
+            behavior: "smooth",
+          });
+        }
+      }, 60);
+    },
+    [setChoice],
+  );
 
-  const personalised = choices.length;
+  const personalised = choices.filter(
+    (c) => c.action !== "keep" && c.action !== "neutral",
+  ).length;
 
   return (
     <main className="relative h-[100dvh] overflow-hidden">
@@ -75,38 +89,39 @@ export default function CustomisePage() {
         onScroll={handleScroll}
         className="no-scrollbar h-full snap-y snap-mandatory overflow-y-scroll overscroll-contain scroll-smooth"
       >
-        {feed.map((card, i) => (
-          <section
-            key={`${card.id}-${i}`}
-            className="flex h-[100dvh] snap-start flex-col justify-center px-5 pb-28 pt-24"
-          >
-            <CustomisationCard
-              card={card}
-              selected={getChoice(card.id)}
-              onAction={(action: CardAction) => setChoice(card.id, action)}
-            />
-            {i === 0 && activeIndex === 0 ? (
-              <div className="mt-5 flex flex-col items-center gap-1 text-ink-faint">
-                <span className="text-xs">Swipe up for more</span>
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="animate-bounce"
-                >
-                  <path
-                    d="M12 5v14M6 13l6 6 6-6"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </div>
-            ) : null}
-          </section>
-        ))}
+        {feed.map((card, i) => {
+          const isBelief = card.type === "belief";
+          return (
+            <section
+              key={`${card.id}-${i}`}
+              className="flex h-[100dvh] snap-start flex-col justify-center px-5 pb-28 pt-24"
+            >
+              <SwipeCard
+                leftLabel={isBelief ? "Disagree" : "Less"}
+                rightLabel={isBelief ? "Agree" : "More"}
+                onCommit={(dir) =>
+                  chooseAndAdvance(
+                    card.id,
+                    dir === "right"
+                      ? isBelief
+                        ? "agree"
+                        : "more"
+                      : isBelief
+                        ? "disagree"
+                        : "less",
+                    i,
+                  )
+                }
+              >
+                <CustomisationCard
+                  card={card}
+                  selected={getChoice(card.id)}
+                  onAction={(action) => chooseAndAdvance(card.id, action, i)}
+                />
+              </SwipeCard>
+            </section>
+          );
+        })}
       </div>
 
       {/* Bottom overlay: jump to the impact summary whenever ready */}
